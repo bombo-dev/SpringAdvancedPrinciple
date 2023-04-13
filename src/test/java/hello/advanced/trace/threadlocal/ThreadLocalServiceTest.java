@@ -22,10 +22,9 @@ public class ThreadLocalServiceTest {
         threadB.setName("thread-B");
 
         threadA.start();
-        sleep(2000); // 동시성 문제가 발생하지 않음.
-//        sleep(100); // 동시성 문제가 발생
+//        sleep(2000); // 동시성 문제가 발생하지 않음.
+        sleep(100); // 동시성 문제 발생 X, 각각 다른 저장소에서 값을 저장하고 가져오기 때문에 동시성 문제가 발생 절대 X
         threadB.start();
-        // 이제는 각각 다른 쓰레드 전용 저장소를 사용하기 때문에 각 nameStore 에 값을 저장할 때 null 을 확인 할 수 있다.
 
         sleep(3000); // 메인 쓰레드가 종료하지 않도록 대기
         log.info("main exit");
