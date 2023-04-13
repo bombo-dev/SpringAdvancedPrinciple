@@ -4,13 +4,16 @@ import hello.advanced.trace.threadlocal.code.ThreadLocalService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Slf4j
 public class ThreadLocalServiceTest {
 
     private ThreadLocalService threadLocalService = new ThreadLocalService();
 
     @Test
-    void field() {
+    void threadLocal() {
         log.info("main start");
 
         Runnable userA = () -> threadLocalService.logic("userA");
@@ -27,6 +30,23 @@ public class ThreadLocalServiceTest {
         threadB.start();
 
         sleep(3000); // 메인 쓰레드가 종료하지 않도록 대기
+        log.info("main exit");
+    }
+
+    @Test
+    void threadLocalPool() {
+        log.info("main start");
+
+        Runnable userA = () -> threadLocalService.logic("userA");
+        Runnable userB = () -> threadLocalService.logic("userB");
+
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        service.execute(userA);
+        service.execute(userB);
+        sleep(1500);
+        service.execute(userA);
+        sleep(2000);
+        service.shutdown();
         log.info("main exit");
     }
 
