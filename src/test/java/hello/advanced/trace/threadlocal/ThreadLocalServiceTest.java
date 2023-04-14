@@ -50,6 +50,23 @@ public class ThreadLocalServiceTest {
         log.info("main exit");
     }
 
+    @Test
+    void threadLocalRemovePool() {
+        log.info("main start");
+
+        Runnable userA = () -> threadLocalService.logic("userA");
+        Runnable userB = () -> threadLocalService.logic("userB");
+
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        service.execute(userA);
+        service.execute(userB);
+        sleep(1500);
+        service.execute(userA);
+        sleep(2000);
+        service.shutdown();
+        log.info("main exit");
+    }
+
     private void sleep(int millis) {
         try {
             Thread.sleep(millis);

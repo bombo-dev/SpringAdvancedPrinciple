@@ -11,6 +11,7 @@ public class ThreadLocalService {
         nameStore.set(name);
         sleep(1000);
         log.info("조회 nameStore = {}", nameStore.get());
+        nameStore.remove();
         return nameStore.get();
     }
 
