@@ -8,6 +8,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +22,9 @@ public class ProxyFactoryConfigV1 {
         ProxyFactory proxyFactory = new ProxyFactory(orderController);
         Advisor advisor = getAdvisor(logTrace);
         proxyFactory.addAdvisor(advisor);
-        return (OrderControllerV1) proxyFactory.getProxy();
+        OrderControllerV1 proxy = (OrderControllerV1) proxyFactory.getProxy();
+        log.info("ProxyFactory proxy={}, target={}", proxy.getClass(), orderController.getClass());
+        return proxy;
     }
 
     @Bean
@@ -30,7 +33,9 @@ public class ProxyFactoryConfigV1 {
         ProxyFactory proxyFactory = new ProxyFactory(orderService);
         Advisor advisor = getAdvisor(logTrace);
         proxyFactory.addAdvisor(advisor);
-        return (OrderServiceV1) proxyFactory.getProxy();
+        OrderServiceV1 proxy = (OrderServiceV1) proxyFactory.getProxy();
+        log.info("ProxyFactory proxy={}, target={}", proxy.getClass(), orderService.getClass());
+        return proxy;
     }
 
     @Bean
@@ -39,10 +44,15 @@ public class ProxyFactoryConfigV1 {
         ProxyFactory proxyFactory = new ProxyFactory(orderRepository);
         Advisor advisor = getAdvisor(logTrace);
         proxyFactory.addAdvisor(advisor);
-        return (OrderRepositoryV1) proxyFactory.getProxy();
+        OrderRepositoryV1 proxy = (OrderRepositoryV1) proxyFactory.getProxy();
+        log.info("ProxyFactory proxy={}, target={}", proxy.getClass(), orderRepository.getClass());
+        return proxy;
     }
 
     private Advisor getAdvisor(LogTrace logTrace) {
-        return new DefaultPointcutAdvisor(Pointcut.TRUE, new LogTraceAdvice(logTrace));
+        //pointcut
+        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
+        nameMatchMethodPointcut.setMappedNames("request*", "order*", "save*");
+        return new DefaultPointcutAdvisor(nameMatchMethodPointcut, new LogTraceAdvice(logTrace));
     }
 }
